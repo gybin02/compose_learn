@@ -24,6 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.compose050620.ui.login.LoginPage
+import com.example.compose050620.ui.movie.MoviePage
+import com.example.compose050620.ui.movie.MovieViewModel
+import com.example.compose050620.ui.profile.UserProfile
 import com.example.compose050620.ui.theme.Compose050620Theme
 
 class MainActivity : ComponentActivity() {
@@ -31,14 +42,41 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Compose050620Theme(content = { MainPage() })
+            Compose050620Theme(content = {
+                val movieViewModel = MovieViewModel()
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = Router.MAIN) {
+                    composable(Router.MAIN) { MainPage(navController) }
+                    composable(Router.PROFILE) { UserProfile() }
+                    composable(Router.MOVIE_LIST) { MoviePage(movieViewModel) }
+                    composable(Router.LOGIN, listOf(navArgument("msg") { defaultValue = "hello" })) { it ->
+                        val arguments = it.arguments
+                        val msg = arguments?.getString("msg") ?: ""
+                        LoginPage(navController = navController, msg)
+                    }
+                }
+            })
         }
     }
 }
 
+//创建所有的路由
+object Router {
+    const val MAIN = "main"
+    const val LOGIN = "login"
+    const val PROFILE = "profile"
+    const val MOVIE_LIST = "movieList"
+    const val MOVIE_DETAIL = "movieDetail"
+    const val MOVIE_COMMENT = "movieComment"
+    const val MOVIE_SEARCH = "movieSearch"
+    const val MOVIE_COLLECTION = "movieCollection"
+    const val MOVIE_FAVORITE = "movieFavorite"
+    const val MOVIE_WATCHLIST = "movieWatchlist"
+}
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-private fun MainPage() {
+private fun MainPage(navController: NavHostController) {
     Scaffold {
         Box {
             Column(
@@ -52,21 +90,32 @@ private fun MainPage() {
                 )
 
                 Button(onClick = {
-//            startActivity(Intent(this, MainActivity2::class.java))
+                    navController.navigate(Router.LOGIN)
                 }) {
                     Text(text = "跳转到登录页面")
                 }
 
                 OutlinedButton(onClick = {
+                    val bundle = Bundle().apply {
+                        putString("msg", "New MSg")
+                    }
+//                    navController.navigate("destination", bundle)
+//                    navController.navigate(Router.LOGIN)
+                    val findNode = navController.graph.findNode(Router.LOGIN) ?: return@OutlinedButton
+                    navController.navigate(findNode.id, bundle)
                 }) {
                     Text(text = "跳转到登录页面-------long")
                 }
-                Text(
-                    text = "文本靠左显示",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Start,
-                )
-
+                //按钮居左显示
+                Button(
+                    onClick = {
+                        navController.navigate(Router.MOVIE_LIST)
+                    },
+                ) {
+                    Text(
+                        text = "文本靠左显示,电影列表",
+                    )
+                }
                 Text(
                     text = "文本靠右显示",
                     modifier = Modifier.fillMaxWidth(),
@@ -148,6 +197,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     Compose050620Theme {
-        MainPage()
+        MainPage(rememberNavController())
     }
 }
