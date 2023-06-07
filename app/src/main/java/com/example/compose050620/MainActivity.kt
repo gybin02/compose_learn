@@ -19,6 +19,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -32,12 +33,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.compose050620.ui.login.LoginPage
+import com.example.compose050620.ui.lottie.LottiePage
 import com.example.compose050620.ui.movie.MoviePage
 import com.example.compose050620.ui.movie.MovieViewModel
 import com.example.compose050620.ui.profile.UserProfile
+import com.example.compose050620.ui.tab.TabPage
+import com.example.compose050620.ui.tab.tabPage
 import com.example.compose050620.ui.theme.Compose050620Theme
 
 class MainActivity : ComponentActivity() {
+
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +58,13 @@ class MainActivity : ComponentActivity() {
                         val arguments = it.arguments
                         val msg = arguments?.getString("msg") ?: ""
                         LoginPage(navController = navController, msg)
+                    }
+                    composable(Router.TAB_PAGE) {
+                        TabPage(navController = navController)
+                    }
+                    tabPage(navController)
+                    composable(Router.LOTTIE) {
+                        LottiePage()
                     }
                 }
             })
@@ -72,6 +84,15 @@ object Router {
     const val MOVIE_COLLECTION = "movieCollection"
     const val MOVIE_FAVORITE = "movieFavorite"
     const val MOVIE_WATCHLIST = "movieWatchlist"
+
+    const val TAB_PAGE = "tabPage"
+    const val TAB_PAGE_1 = "tabPage1"
+    const val TAB_PAGE_2 = "tabPage2"
+    const val TAB_PAGE_3 = "tabPage3"
+    const val TAB_PAGE_4 = "tabPage4"
+
+    const val LOTTIE = "lottie"
+
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -116,6 +137,19 @@ private fun MainPage(navController: NavHostController) {
                         text = "文本靠左显示,电影列表",
                     )
                 }
+
+                Button(onClick = {
+                    navController.navigate(Router.TAB_PAGE)
+                }) {
+                    Text(text = "点击进入Tab页面")
+                }
+
+                Button(onClick = {
+                    navController.navigate(Router.LOTTIE)
+                }) {
+                    Text(text = "Lottie 动画")
+                }
+
                 Text(
                     text = "文本靠右显示",
                     modifier = Modifier.fillMaxWidth(),

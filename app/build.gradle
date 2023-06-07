@@ -65,6 +65,9 @@ dependencies {
     //新库
     //图片加载
     implementation("io.coil-kt:coil-compose:2.4.0")
+    //动画库
+    def lottieVersion = "3.4.4"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
 
 
     testImplementation 'junit:junit:4.13.2'
